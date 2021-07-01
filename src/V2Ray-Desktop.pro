@@ -43,7 +43,7 @@ SOURCES += \
 
 include(3rdparty/quazip/quazip/quazip.pri)
 include(3rdparty/qzxing/src/QZXing.pri)
-LIBS += -lz
+
 
 RESOURCES += qml.qrc
 
@@ -68,4 +68,10 @@ unix {
 }
 osx {
     ICON       = images/v2ray.icns
+}
+
+win32-msvc* {
+    INCLUDEPATH += $$[QT_INSTALL_PREFIX]/../Src/qtbase/src/3rdparty/zlib/src
+} else {
+    LIBS += -lz
 }

@@ -9,32 +9,30 @@
 #include <QString>
 #include <QVariant>
 
-class AppProxyWorker : public QObject {
-  Q_OBJECT
- public:
-  explicit AppProxyWorker(QObject* parent = nullptr);
+class AppProxyWorker : public QObject
+{
+    Q_OBJECT
+public:
+    explicit AppProxyWorker(QObject *parent = nullptr);
 
- public slots:
-  void getServerLatency(QJsonArray servers);
-  void getGfwList(QString gfwListUrl, QNetworkProxy proxy);
-  void getUrlAccessibility(QMap<QString, bool> urls, QNetworkProxy proxy);
-  void getSubscriptionServers(QString url, QNetworkProxy proxy);
-  void getLogs(QString appLogFilePath, QString v2RayLogFilePath);
-  void getLatestRelease(QString name, QString releaseUrl, QNetworkProxy proxy);
-  void upgradeDependency(QString name,
-                         QString assetsUrl,
-                         QString outputFolderPath,
-                         QNetworkProxy proxy);
+public slots:
+    void getServerLatency(QJsonArray servers);
+    void getGfwList(QString gfwListUrl, QNetworkProxy proxy);
+    void getUrlAccessibility(QMap<QString, bool> urls, QNetworkProxy proxy);
+    void getSubscriptionServers(QString url, QNetworkProxy proxy);
+    void getLogs(QString appLogFilePath, QString v2RayLogFilePath);
+    void getLatestRelease(QString name, QString releaseUrl, QNetworkProxy proxy);
+    void upgradeDependency(QString name, QString assetsUrl, QString outputFolderPath,
+                           QNetworkProxy proxy);
 
- signals:
-  void serverLatencyReady(QMap<QString, QVariant> latency);
-  void gfwListReady(QString gfwList);
-  void urlAccessibilityReady(QMap<QString, bool> accessible);
-  void subscriptionServersReady(QString subscriptionServers,
-                                QString subscriptionUrl);
-  void logsReady(QString logs);
-  void latestReleaseReady(QString name, QString version);
-  void upgradeFinished(QString name, QString outputFilePath, QString errorMsg);
+signals:
+    void serverLatencyReady(QMap<QString, QVariant> latency);
+    void gfwListReady(QString gfwList);
+    void urlAccessibilityReady(QMap<QString, bool> accessible);
+    void subscriptionServersReady(QString subscriptionServers, QString subscriptionUrl);
+    void logsReady(QString logs);
+    void latestReleaseReady(QString name, QString version);
+    void upgradeFinished(QString name, QString outputFilePath, QString errorMsg);
 };
 
-#endif  // APPPROXYWORKER_H
+#endif // APPPROXYWORKER_H

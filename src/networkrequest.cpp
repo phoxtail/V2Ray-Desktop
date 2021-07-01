@@ -12,58 +12,56 @@
 
 #include "constants.h"
 
-NetworkRequest::NetworkRequest() {}
+NetworkRequest::NetworkRequest() { }
 
-QByteArray NetworkRequest::getNetworkResponse(QString url,
-                                              const QNetworkProxy* proxy,
-                                              int timeout) {
-  QTimer timer;
-  timer.setSingleShot(true);
+QByteArray NetworkRequest::getNetworkResponse(QString url, const QNetworkProxy *proxy, int timeout)
+{
+    QTimer timer;
+    timer.setSingleShot(true);
 
-  QNetworkAccessManager accessManager;
-  if (proxy != nullptr) {
-    accessManager.setProxy(*proxy);
-  }
-  QNetworkRequest request;
+    QNetworkAccessManager accessManager;
+    if (proxy != nullptr) {
+        accessManager.setProxy(*proxy);
+    }
+    QNetworkRequest request;
 
-  request.setUrl(QUrl(url));
-  request.setSslConfiguration(QSslConfiguration::defaultConfiguration());
-  request.setAttribute(QNetworkRequest::FollowRedirectsAttribute, true);
-  qInfo() << "Start to get url: " << url;
-  QNetworkReply* networkReply = accessManager.get(request);
-  QEventLoop eventLoop;
-  connect(&timer, &QTimer::timeout, &eventLoop, &QEventLoop::quit);
-  connect(networkReply, &QNetworkReply::finished, &eventLoop,
-          &QEventLoop::quit);
-  if (timeout > 0) {
-    timer.start(timeout);
-  }
-  eventLoop.exec();
+    request.setUrl(QUrl(url));
+    request.setSslConfiguration(QSslConfiguration::defaultConfiguration());
+    request.setAttribute(QNetworkRequest::FollowRedirectsAttribute, true);
+    qInfo() << "Start to get url: " << url;
+    QNetworkReply *networkReply = accessManager.get(request);
+    QEventLoop eventLoop;
+    connect(&timer, &QTimer::timeout, &eventLoop, &QEventLoop::quit);
+    connect(networkReply, &QNetworkReply::finished, &eventLoop, &QEventLoop::quit);
+    if (timeout > 0) {
+        timer.start(timeout);
+    }
+    eventLoop.exec();
 
-  // Timeout handler
-  if (timeout > 0 && !timer.isActive()) {
-    disconnect(networkReply, &QNetworkReply::finished, &eventLoop,
-               &QEventLoop::quit);
-    networkReply->abort();
-    qWarning() << "Timed out when requesting " << url;
-  }
-  // Network error Handler
-  if (networkReply->error() != QNetworkReply::NoError) {
-    qCritical() << "Error occurred during requsting " << url
-                << "; Error: " << networkReply->error();
-    return QByteArray();
-  }
-  QByteArray responseBytes = networkReply->readAll();
-  networkReply->deleteLater();
-  networkReply->manager()->deleteLater();
-  return responseBytes;
+    // Timeout handler
+    if (timeout > 0 && !timer.isActive()) {
+        disconnect(networkReply, &QNetworkReply::finished, &eventLoop, &QEventLoop::quit);
+        networkReply->abort();
+        qWarning() << "Timed out when requesting " << url;
+    }
+    // Network error Handler
+    if (networkReply->error() != QNetworkReply::NoError) {
+        qCritical() << "Error occurred during requsting " << url
+                    << "; Error: " << networkReply->error();
+        return QByteArray();
+    }
+    QByteArray responseBytes = networkReply->readAll();
+    networkReply->deleteLater();
+    networkReply->manager()->deleteLater();
+    return responseBytes;
 }
 
-int NetworkRequest::getLatency(QString host, int port) {
-  QTcpSocket socket;
-  QDateTime time = QDateTime::currentDateTime();
-  socket.connectToHost(host, port);
-  socket.waitForConnected(TCP_PING_TIMEOUT);
-  int timeEclipsed = time.msecsTo(QDateTime::currentDateTime());
-  return timeEclipsed >= TCP_PING_TIMEOUT ? -1 : timeEclipsed;
+int NetworkRequest::getLatency(QString host, int port)
+{
+    QTcpSocket socket;
+    QDateTime time = QDateTime::currentDateTime();
+    socket.connectToHost(host, port);
+    socket.waitForConnected(TCP_PING_TIMEOUT);
+    int timeEclipsed = time.msecsTo(QDateTime::currentDateTime());
+    return timeEclipsed >= TCP_PING_TIMEOUT ? -1 : timeEclipsed;
 }
